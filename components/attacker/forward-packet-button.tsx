@@ -1,59 +1,58 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
-  Send,
   CheckCircle2,
+  Forward,
   AlertTriangle,
-  Loader2,
 } from "lucide-react";
 
 interface Props {
   transferId: string;
+  onSuccess?: () => void;
 }
 
 export default function ForwardPacketButton({
   transferId,
+  onSuccess,
 }: Props) {
-  const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
   async function forwardPacket() {
-    if (loading) return;
-
     setLoading(true);
 
     const loadingToast = toast.loading(
-      "Forwarding Packet...",
+      "Forwarding packet...",
       {
         description:
-          "Securely delivering the packet to the intended receiver.",
+          "Receiver will verify the document integrity.",
       }
     );
 
     try {
-      const res = await fetch("/api/attacker/forward", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          transferId,
-        }),
-      });
+      const response = await fetch(
+        "/api/attacker/forward",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            transferId,
+          }),
+        }
+      );
 
-      const result = await res.json();
+      const result = await response.json();
 
       toast.dismiss(loadingToast);
 
-      if (!res.ok) {
+      if (!response.ok || !result.success) {
         toast.error("Forward Failed", {
           description:
-            result.error ??
-            "Unable to forward the packet.",
+            result.error ||
+            "Unable to forward packet.",
           icon: (
             <AlertTriangle className="h-5 w-5" />
           ),
@@ -62,27 +61,23 @@ export default function ForwardPacketButton({
         return;
       }
 
-      toast.success("Packet Delivered", {
+      toast.success("Packet Forwarded", {
         description:
-          "The packet has been securely forwarded to the receiver.",
+          "SHA-256 verification passed and the document was delivered.",
         icon: (
           <CheckCircle2 className="h-5 w-5" />
         ),
       });
 
-      // Give users enough time to see the success notification
-      setTimeout(() => {
-        router.refresh();
-      }, 2200);
-    } catch {
+      onSuccess?.();
+    } catch (error) {
+      console.error(error);
+
       toast.dismiss(loadingToast);
 
-      toast.error("Network Error", {
+      toast.error("Unexpected Error", {
         description:
-          "Something went wrong while forwarding the packet.",
-        icon: (
-          <AlertTriangle className="h-5 w-5" />
-        ),
+          "Unable to forward packet.",
       });
     } finally {
       setLoading(false);
@@ -90,32 +85,16 @@ export default function ForwardPacketButton({
   }
 
   return (
-    <div className="mt-8 rounded-2xl border border-green-700/60 bg-gradient-to-br from-green-950 to-slate-900 p-6 shadow-xl shadow-green-900/20">
-      <h2 className="text-xl font-bold text-green-400">
-        Forward Packet
-      </h2>
+    <button
+      disabled={loading}
+      onClick={forwardPacket}
+      className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      <Forward className="h-5 w-5" />
 
-      <p className="mt-2 text-sm text-slate-300">
-        Securely send this packet to the intended receiver.
-      </p>
-
-      <button
-        onClick={forwardPacket}
-        disabled={loading}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-6 py-3 font-semibold text-white transition-all duration-300 hover:bg-green-500 hover:shadow-lg hover:shadow-green-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {loading ? (
-          <>
-            <Loader2 className="h-5 w-5 animate-spin" />
-            Forwarding...
-          </>
-        ) : (
-          <>
-            <Send className="h-5 w-5" />
-            Forward Packet
-          </>
-        )}
-      </button>
-    </div>
+      {loading
+        ? "Forwarding..."
+        : "Forward Packet"}
+    </button>
   );
 }

@@ -16,34 +16,32 @@ export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"),
 
   title: {
-    default: "Secure Transfer",
-    template: "%s | Secure Transfer",
+    default: "SATIM — Secure Academic Transfer & Integrity Monitoring",
+    template: "%s | SATIM",
   },
 
   description:
-    "A modern secure file transfer platform featuring AES-256 encryption, SHA-256 integrity verification, attack simulation, and secure communication.",
+    "Secure academic document transfer with encryption, integrity verification, controlled MITM simulation, and security monitoring.",
 
-  applicationName: "Secure Transfer",
+  applicationName: "SATIM",
 
   keywords: [
-    "Secure File Transfer",
-    "AES-256",
+    "Secure Academic Document Transfer",
+    "Academic Security",
+    "AES Encryption",
     "SHA-256",
+    "MITM Simulation",
+    "Document Integrity",
     "Cybersecurity",
-    "Network Security",
-    "Secure Communication",
-    "File Encryption",
-    "Next.js",
-    "Final Year Project",
   ],
 
   authors: [
     {
-      name: "Secure Transfer",
+      name: "SATIM",
     },
   ],
 
-  creator: "Secure Transfer",
+  creator: "SATIM",
 
   icons: {
     icon: "/favicon.ico",
@@ -51,8 +49,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#020617",
-  colorScheme: "dark",
+  themeColor: "#ffffff",
+  colorScheme: "light",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -63,20 +64,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geist.variable} h-full scroll-smooth`}
+      className={`${geist.variable} h-full scroll-smooth`}
       suppressHydrationWarning
     >
-      <body
-        className="
-          min-h-screen
-          bg-background
-          text-foreground
-          font-sans
-          antialiased
-          selection:bg-indigo-600
-          selection:text-white
-        "
-      >
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <Providers>
           {children}
 
@@ -86,13 +77,13 @@ export default function RootLayout({
             expand
             closeButton
             duration={3500}
-            theme="dark"
+            theme="light"
             toastOptions={{
               classNames: {
                 toast:
-                  "bg-slate-900 border border-slate-700 text-slate-100 shadow-2xl",
-                title: "font-semibold",
-                description: "text-slate-400",
+                  "border border-black/[0.07] bg-white text-slate-950 shadow-2xl",
+                title: "font-semibold text-slate-950",
+                description: "text-slate-500",
               },
             }}
           />

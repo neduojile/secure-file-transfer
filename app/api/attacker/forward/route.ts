@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
@@ -8,16 +8,16 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { success: false, error: "Unauthorized." },
         { status: 401 }
       );
     }
 
     if (session.user.role !== "ATTACKER") {
       return NextResponse.json(
-        { error: "Forbidden" },
+        { success: false, error: "Forbidden." },
         { status: 403 }
       );
     }
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     if (!transferId) {
       return NextResponse.json(
-        { error: "Transfer ID is required." },
+        { success: false, error: "Transfer ID is required." },
         { status: 400 }
       );
     }
@@ -39,78 +39,105 @@ export async function POST(req: NextRequest) {
 
     if (!transfer) {
       return NextResponse.json(
-        { error: "Packet not found." },
+        { success: false, error: "Packet not found." },
         { status: 404 }
       );
     }
 
     if (transfer.status !== "IN_TRANSIT") {
       return NextResponse.json(
-        { error: "Packet is no longer in transit." },
+        {
+          success: false,
+          error: "Packet is no longer in transit.",
+        },
         { status: 400 }
       );
     }
 
-// Move packet to VERIFYING
-const updatedTransfer = await prisma.fileTransfer.update({
-  where: {
-    id: transferId,
-  },
-  data: {
-    status: "VERIFYING",
-  },
-});
-
-// Log forwarding
-await prisma.securityLog.create({
-  data: {
-    action: "PACKET_FORWARDED",
-    description: `Packet ${transfer.fileName} forwarded by attacker.`,
-    securityLevel: "MEDIUM",
-    attackDetected: false,
-    userId: session.user.id,
-    transferId: transfer.id,
-  },
-});
-
-// Simulate receiver verification
-await prisma.fileTransfer.update({
-  where: {
-    id: transferId,
-  },
-  data: {
-    status: "DELIVERED",
-  },
-});
-
-await prisma.securityLog.create({
-  data: {
-    action: "DELIVERED",
-    description: `Packet delivered successfully after verification.`,
-    securityLevel: "LOW",
-    attackDetected: false,
-    userId: transfer.senderId,
-    transferId: transfer.id,
-  },
-});
+    const updated = await prisma.fileTransfer.update({
+      where: {
+        id: transfer.id,
+      },
+      data: {
+        status: "VERIFYING",
+        attackAction: "FORWARDED",
+        interceptedAt: new Date(),
+        currentHash: transfer.hash,
+      },
+    });
 
     await prisma.securityLog.create({
       data: {
-        action: "PACKET_FORWARDED",
-        description: `Packet ${transfer.fileName} forwarded by attacker.`,
+        action: "PACKET_INTERCEPTED",
+        description:
+          `Packet "${transfer.fileName}" was intercepted and forwarded without modification.`,
         securityLevel: "MEDIUM",
-        attackDetected: true,
+        attackDetected: false,
         userId: session.user.id,
         transferId: transfer.id,
       },
     });
 
+    const verified = transfer.hash === updated.currentHash;
+
+    const finalTransfer = await prisma.fileTransfer.update({
+      where: {
+        id: transfer.id,
+      },
+      data: {
+        status: "DELIVERED",
+        integrity: verified ? "VERIFIED" : "COMPROMISED",
+        verifiedAt: new Date(),
+      },
+    });
+
+    await prisma.securityLog.create({
+      data: {
+        action: verified
+          ? "INTEGRITY_VERIFIED"
+          : "INTEGRITY_COMPROMISED",
+        description: verified
+          ? `SHA-256 verification passed for "${transfer.fileName}". The document was delivered without modification.`
+          : `SHA-256 verification failed for "${transfer.fileName}".`,
+        securityLevel: verified ? "LOW" : "HIGH",
+        attackDetected: !verified,
+        userId: session.user.id,
+        transferId: transfer.id,
+      },
+    });
+
+    await prisma.securityLog.create({
+      data: {
+        action: "DELIVERED",
+        description:
+          `Packet "${transfer.fileName}" delivered after integrity verification.`,
+        securityLevel: verified ? "LOW" : "HIGH",
+        attackDetected: !verified,
+        userId: transfer.senderId,
+        transferId: transfer.id,
+      },
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: transfer.senderId,
+        title: "Security Alert",
+        message: `Your document "${transfer.fileName}" was intercepted by the MITM simulation and forwarded without modification. SHA-256 integrity verification passed.`,
+      },
+    });
+
     return NextResponse.json({
       success: true,
-      message: "Packet forwarded successfully.",
+      delivered: true,
+      attackDetected: !verified,
+      integrity: finalTransfer.integrity,
+      attackAction: finalTransfer.attackAction,
+      status: finalTransfer.status,
+      message:
+        "Packet intercepted, forwarded, and integrity verified successfully.",
     });
   } catch (error) {
-    console.error(error);
+    console.error("FORWARD ERROR:", error);
 
     return NextResponse.json(
       {

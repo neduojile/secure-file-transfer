@@ -21,7 +21,7 @@ const links = [
     icon: LayoutDashboard,
   },
   {
-    name: "Upload",
+    name: "Upload Documents",
     href: "/dashboard/upload",
     icon: Upload,
   },
@@ -36,7 +36,7 @@ const links = [
     icon: Inbox,
   },
   {
-    name: "Security Logs",
+    name: "Security Center",
     href: "/dashboard/security",
     icon: ShieldCheck,
   },
@@ -51,9 +51,7 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
 
   return (
- <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-slate-800 bg-slate-950">
-      {/* Logo */}
-
+    <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-slate-800 bg-slate-950">
       <div className="border-b border-slate-800 px-6 py-6">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-600/20">
@@ -62,22 +60,19 @@ export default function DashboardSidebar() {
 
           <div>
             <h1 className="text-lg font-semibold tracking-tight text-slate-100">
-              Secure Transfer
+              Academic Secure
             </h1>
 
             <p className="text-xs text-slate-400">
-              Cyber Security Platform
+              Document Security Platform
             </p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-
       <nav className="flex-1 space-y-1.5 p-4">
         {links.map((link) => {
           const isActive = pathname === link.href;
-
           const Icon = link.icon;
 
           return (
@@ -93,7 +88,7 @@ export default function DashboardSidebar() {
               <div className="flex items-center gap-3">
                 <Icon
                   className={`h-5 w-5 transition-transform duration-200 ${
-                    !isActive && "group-hover:scale-110"
+                    !isActive ? "group-hover:scale-110" : ""
                   }`}
                 />
 
@@ -110,8 +105,6 @@ export default function DashboardSidebar() {
         })}
       </nav>
 
-      {/* Footer */}
-
       <div className="border-t border-slate-800 p-5">
         <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
           <div className="mb-2 flex items-center gap-2">
@@ -126,11 +119,13 @@ export default function DashboardSidebar() {
             AES-256 Encryption
             <br />
             SHA-256 Integrity Verification
+            <br />
+            MITM Simulation Monitoring
           </p>
         </div>
 
         <p className="mt-5 text-center text-xs text-slate-500">
-          © 2026 Secure Transfer
+          (c) 2026 Academic Secure
         </p>
       </div>
     </aside>

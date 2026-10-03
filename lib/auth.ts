@@ -1,4 +1,4 @@
-import { compare } from "bcryptjs";
+﻿import { compare } from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
@@ -6,11 +6,11 @@ import { prisma } from "./prisma";
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 60 * 60 * 24, // 24 hours
+    maxAge: 60 * 60 * 24,
   },
 
   jwt: {
-    maxAge: 60 * 60 * 24, // 24 hours
+    maxAge: 60 * 60 * 24,
   },
 
   providers: [
@@ -41,6 +41,12 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) {
           throw new Error("User not found");
+        }
+
+        if (user.isBlocked) {
+          throw new Error(
+            "This account has been blocked by the administrator."
+          );
         }
 
         const passwordMatch = await compare(

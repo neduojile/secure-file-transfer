@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 
@@ -52,7 +52,7 @@ export default function PacketMonitor() {
   useEffect(() => {
     loadPackets();
 
-    const interval = setInterval(loadPackets, 3000);
+    const interval = setInterval(loadPackets, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -140,11 +140,11 @@ export default function PacketMonitor() {
                   <td>
                     {packet.encrypted ? (
                       <span className="text-green-500">
-                        🔒 AES-256
+                        ðŸ”’ AES-256
                       </span>
                     ) : (
                       <span className="text-yellow-500">
-                        ❌ Plain
+                        âŒ Plain
                       </span>
                     )}
                   </td>

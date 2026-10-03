@@ -1,3 +1,4 @@
+import { calculateSHA256 } from "@/lib/hash/sha256";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
@@ -5,18 +6,13 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { saveUploadedFile } from "@/lib/storage/upload";
 
-
 import fs from "fs/promises";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    console.log("SESSION:", session);
-console.log("ROLE:", session?.user?.role);
-console.log("EMAIL:", session?.user?.email);
-
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         {
           success: false,
@@ -40,30 +36,15 @@ console.log("EMAIL:", session?.user?.email);
       );
     }
 
-    const attacker = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
-    });
-
-    if (!attacker) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Attacker not found.",
-        },
-        {
-          status: 404,
-        }
-      );
-    }
-
     const formData = await req.formData();
 
-    const transferId = formData.get("transferId") as string;
-    const replacement = formData.get("file") as File;
+    const transferId = formData.get("transferId")?.toString();
+    const replacement = formData.get("file");
 
-    if (!transferId || !replacement) {
+    if (
+      !transferId ||
+      !(replacement instanceof File)
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -109,7 +90,8 @@ console.log("EMAIL:", session?.user?.email);
       return NextResponse.json(
         {
           success: false,
-          error: "Encrypted files cannot be replaced.",
+          error:
+            "Encrypted files cannot be replaced in this simulation. Use an unencrypted test document to demonstrate modification detection.",
         },
         {
           status: 403,
@@ -117,12 +99,15 @@ console.log("EMAIL:", session?.user?.email);
       );
     }
 
-    const bytes = await replacement.arrayBuffer();
+    const replacementBuffer = Buffer.from(
+      await replacement.arrayBuffer()
+    );
 
-    const buffer = Buffer.from(bytes);
+    const replacementHash =
+      calculateSHA256(replacementBuffer);
 
     const upload = await saveUploadedFile(
-      buffer,
+      replacementBuffer,
       replacement.name,
       false
     );
@@ -130,84 +115,131 @@ console.log("EMAIL:", session?.user?.email);
     try {
       await fs.unlink(transfer.filePath);
     } catch {
-      // Ignore if the old file cannot be deleted.
+      // The original file may already be unavailable.
     }
 
-await prisma.fileTransfer.update({
-  where: {
-    id: transfer.id,
-  },
-  data: {
-    fileName: replacement.name,
-    fileSize: replacement.size,
-    fileType: replacement.type || "application/octet-stream",
+    const attackDetected = transfer.hash !== replacementHash;
 
-    storedName: upload.storedName,
-    filePath: upload.filePath,
+    const modifiedTransfer =
+      await prisma.fileTransfer.update({
+        where: {
+          id: transfer.id,
+        },
+        data: {
+          fileName: replacement.name,
+          fileSize: replacement.size,
+          fileType:
+            replacement.type ||
+            "application/octet-stream",
 
-    status: "ATTACK_DETECTED",
-  },
-});
+          storedName: upload.storedName,
+          filePath: upload.filePath,
 
+          currentHash: replacementHash,
+          attackAction: "MODIFIED",
+          interceptedAt: new Date(),
+          integrity: attackDetected
+            ? "COMPROMISED"
+            : "VERIFIED",
+
+          status: "ATTACK_DETECTED",
+        },
+      });
 
     await prisma.securityLog.create({
       data: {
-        action: "FILE_REPLACED",
-        attackDetected: true,
+        action: "FILE_MODIFIED",
+        attackDetected,
         securityLevel: "HIGH",
-        description: `Attacker replaced "${transfer.fileName}" with "${replacement.name}".`,
-        userId: attacker.id,
+        description:
+          `MITM simulation replaced "${transfer.fileName}" with "${replacement.name}". Original and replacement SHA-256 hashes were compared.`,
+        userId: session.user.id,
         transferId: transfer.id,
       },
     });
 
-    // Simulate integrity verification after attack detection
-await prisma.fileTransfer.update({
-  where: {
-    id: transfer.id,
-  },
-  data: {
-    status: "VERIFYING",
-  },
-});
+    await prisma.fileTransfer.update({
+      where: {
+        id: transfer.id,
+      },
+      data: {
+        status: "VERIFYING",
+      },
+    });
 
-await prisma.securityLog.create({
-  data: {
-    action: "VERIFYING",
-    description: "Receiver is verifying the integrity of the modified file.",
-    securityLevel: "HIGH",
-    attackDetected: true,
-    userId: attacker.id,
-    transferId: transfer.id,
-  },
-});
+    await prisma.securityLog.create({
+      data: {
+        action: "INTEGRITY_CHECK",
+        attackDetected,
+        securityLevel: "HIGH",
+        description:
+          `Receiver compared the original SHA-256 hash with the intercepted document hash.`,
+        userId: session.user.id,
+        transferId: transfer.id,
+      },
+    });
 
-await prisma.fileTransfer.update({
-  where: {
-    id: transfer.id,
-  },
-  data: {
-    status: "DELIVERED",
-  },
-});
+    const finalTransfer =
+      await prisma.fileTransfer.update({
+        where: {
+          id: transfer.id,
+        },
+        data: {
+          status: "DELIVERED",
+          integrity: attackDetected
+            ? "COMPROMISED"
+            : "VERIFIED",
+          verifiedAt: new Date(),
+        },
+      });
 
-await prisma.securityLog.create({
-  data: {
-    action: "DELIVERED",
-    description: "Modified file delivered after verification.",
-    securityLevel: "HIGH",
-    attackDetected: true,
-    userId: attacker.id,
-    transferId: transfer.id,
-  },
-});
+    await prisma.securityLog.create({
+      data: {
+        action: attackDetected
+          ? "INTEGRITY_COMPROMISED"
+          : "INTEGRITY_VERIFIED",
+        attackDetected,
+        securityLevel: attackDetected
+          ? "HIGH"
+          : "LOW",
+        description: attackDetected
+          ? `Integrity verification detected that "${replacement.name}" differs from the original document.`
+          : `Integrity verification passed for "${replacement.name}".`,
+        userId: session.user.id,
+        transferId: transfer.id,
+      },
+    });
+
+    await prisma.securityLog.create({
+      data: {
+        action: "DELIVERED",
+        attackDetected,
+        securityLevel: attackDetected
+          ? "HIGH"
+          : "LOW",
+        description: attackDetected
+          ? `Modified document "${replacement.name}" was delivered after the simulated MITM attack was recorded.`
+          : `Document "${replacement.name}" was delivered after verification.`,
+        userId: transfer.senderId,
+        transferId: transfer.id,
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Replacement uploaded successfully.",
+      delivered: true,
+      attackDetected,
+      integrity: finalTransfer.integrity,
+      attackAction: finalTransfer.attackAction,
+      status: finalTransfer.status,
+      originalHash: transfer.hash,
+      currentHash: replacementHash,
+      message: attackDetected
+        ? "File replaced and forwarded. Integrity compromise detected."
+        : "File replaced and forwarded. Integrity verification passed.",
     });
   } catch (error) {
-    console.error(error);
+    console.error("REPLACE ERROR:", error);
 
     return NextResponse.json(
       {
@@ -220,3 +252,4 @@ await prisma.securityLog.create({
     );
   }
 }
+

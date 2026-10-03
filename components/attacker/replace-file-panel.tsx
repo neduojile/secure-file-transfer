@@ -10,12 +10,10 @@ import {
 
 interface Props {
   transferId: string;
-  onReplacementSuccess?: () => void;
 }
 
 export default function ReplaceFilePanel({
   transferId,
-  onReplacementSuccess,
 }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,7 +21,8 @@ export default function ReplaceFilePanel({
   async function uploadReplacement() {
     if (!file) {
       toast.warning("No replacement file selected", {
-        description: "Please choose a replacement file.",
+        description:
+          "Choose the document you want the MITM simulation to inject.",
       });
       return;
     }
@@ -31,9 +30,10 @@ export default function ReplaceFilePanel({
     setLoading(true);
 
     const loadingToast = toast.loading(
-      "Uploading replacement packet...",
+      "Simulating document modification...",
       {
-        description: "Replacing intercepted packet.",
+        description:
+          "Replacing the intercepted academic document and forwarding it to the receiver.",
       }
     );
 
@@ -43,49 +43,66 @@ export default function ReplaceFilePanel({
       formData.append("transferId", transferId);
       formData.append("file", file);
 
-      const res = await fetch("/api/attacker/replace", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "/api/attacker/replace",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-      const result = await res.json();
+      const result = await response.json();
 
-      if (!result.success) {
-        toast.dismiss(loadingToast);
+      toast.dismiss(loadingToast);
 
-        toast.error("Replacement Failed", {
-          description: result.error,
-          icon: <AlertTriangle className="h-5 w-5" />,
+      if (!response.ok || !result.success) {
+        toast.error("Modification Failed", {
+          description:
+            result.error ||
+            "Unable to modify the intercepted document.",
+          icon: (
+            <AlertTriangle className="h-5 w-5" />
+          ),
         });
 
         return;
       }
 
-      toast.dismiss(loadingToast);
-
-      toast.success("Packet Replaced", {
-        description:
-          "Modified packet is now undergoing integrity verification.",
-        icon: <CheckCircle2 className="h-5 w-5" />,
-      });
+      if (result.integrity === "COMPROMISED") {
+        toast.error("Integrity Compromised", {
+          description:
+            "Replacement was forwarded, but SHA-256 verification detected a mismatch.",
+          icon: (
+            <AlertTriangle className="h-5 w-5" />
+          ),
+        });
+      } else {
+        toast.success("Replace & Forward Complete", {
+          description:
+            "The document was forwarded and integrity verification passed.",
+          icon: (
+            <CheckCircle2 className="h-5 w-5" />
+          ),
+        });
+      }
 
       setFile(null);
 
       const input = document.getElementById(
         "replacementFile"
-      ) as HTMLInputElement;
+      ) as HTMLInputElement | null;
 
       if (input) {
         input.value = "";
       }
+    } catch (error) {
+      console.error(error);
 
-      onReplacementSuccess?.();
-    } catch {
       toast.dismiss(loadingToast);
 
       toast.error("Unexpected Error", {
         description:
-          "Unable to upload the replacement file.",
+          "Unable to complete the modification simulation.",
       });
     } finally {
       setLoading(false);
@@ -95,11 +112,12 @@ export default function ReplaceFilePanel({
   return (
     <div className="mt-8 rounded-xl border border-zinc-800 bg-zinc-900 p-6">
       <h2 className="text-2xl font-semibold text-yellow-400">
-        Replace File
+        MITM File Modification
       </h2>
 
       <p className="mt-2 text-zinc-400">
-        Upload another file to replace the intercepted packet.
+        Replace the intercepted document, forward it to the
+        receiver, and test whether SHA-256 detects the change.
       </p>
 
       <input
@@ -137,8 +155,8 @@ export default function ReplaceFilePanel({
         <Upload className="h-5 w-5" />
 
         {loading
-          ? "Uploading..."
-          : "Upload Replacement"}
+          ? "Simulating Attack..."
+          : "Replace & Forward"}
       </button>
     </div>
   );

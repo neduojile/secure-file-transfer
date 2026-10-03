@@ -1,611 +1,724 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { TypeAnimation } from "react-type-animation";
 import {
-  ShieldCheck,
-  Lock,
-  FileCheck,
   ArrowRight,
-  Cpu,
-  Wifi,
-  Server,
+  CheckCircle2,
+  FileCheck2,
+  LockKeyhole,
+  Radar,
+  ScanSearch,
+  ShieldAlert,
+  ShieldCheck,
+  Upload,
+  UserRound,
+  Waypoints,
+  Zap,
 } from "lucide-react";
 
+const features = [
+  {
+    icon: LockKeyhole,
+    title: "AES Encryption",
+    description:
+      "Academic documents are protected before they enter the transfer channel.",
+    tone: "blue",
+  },
+  {
+    icon: FileCheck2,
+    title: "SHA-256 Integrity",
+    description:
+      "Original and received document hashes are compared to expose tampering.",
+    tone: "blue",
+  },
+  {
+    icon: ShieldAlert,
+    title: "MITM Simulation",
+    description:
+      "A controlled interception layer demonstrates how an attacker can alter traffic.",
+    tone: "red",
+  },
+  {
+    icon: Radar,
+    title: "Security Monitoring",
+    description:
+      "Transfer events, attacks and verification results are recorded for review.",
+    tone: "black",
+  },
+];
 
+const workflow = [
+  {
+    number: "01",
+    icon: Upload,
+    title: "Upload",
+    description: "A staff member selects an academic document and authorized receiver.",
+  },
+  {
+    number: "02",
+    icon: LockKeyhole,
+    title: "Encrypt",
+    description: "The document is protected before transmission through the channel.",
+  },
+  {
+    number: "03",
+    icon: Waypoints,
+    title: "Transmit",
+    description: "The protected document moves through the simulated network.",
+  },
+  {
+    number: "04",
+    icon: ScanSearch,
+    title: "Inspect",
+    description: "The MITM simulation can forward, modify or interrupt the transfer.",
+  },
+  {
+    number: "05",
+    icon: FileCheck2,
+    title: "Verify",
+    description: "SHA-256 comparison determines whether the received document changed.",
+  },
+];
+
+const useCases = [
+  "Examination question papers",
+  "Student results and records",
+  "Project and research documents",
+  "Departmental confidential files",
+];
 
 export default function HomePage() {
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-[#020617] text-white">
-
-      {/* ========================= */}
-      {/* Animated Background */}
-      {/* ========================= */}
-
-      <div className="absolute inset-0 overflow-hidden">
-
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,.05)_1px,transparent_1px)] bg-[size:45px_45px]" />
-
-        <motion.div
-          animate={{
-            rotate: 360,
-          }}
-          transition={{
-            duration: 40,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute -left-40 top-20 h-[600px] w-[600px] rounded-full border border-cyan-500/10"
-        />
-
-        <motion.div
-          animate={{
-            rotate: -360,
-          }}
-          transition={{
-            duration: 55,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute right-[-220px] bottom-[-120px] h-[700px] w-[700px] rounded-full border border-cyan-500/10"
-        />
-
-        <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-b from-transparent via-slate-950/30 to-slate-950" />
-
-      </div>
-
-      {/* ========================= */}
-      {/* Navbar */}
-      {/* ========================= */}
-
-      <header className="fixed top-0 z-50 w-full border-b border-cyan-500/10 bg-slate-950/60 backdrop-blur-xl">
-
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-
-          <motion.div
-            initial={{
-              opacity: 0,
-              x: -40,
-            }}
-            animate={{
-              opacity: 1,
-              x: 0,
-            }}
-            className="flex items-center gap-4"
-          >
-
-            <motion.div
-              animate={{
-                rotate: 360,
-                boxShadow: [
-                  "0 0 10px cyan",
-                  "0 0 25px cyan",
-                  "0 0 10px cyan",
-                ],
-              }}
-              transition={{
-                rotate: {
-                  repeat: Infinity,
-                  duration: 18,
-                  ease: "linear",
-                },
-                boxShadow: {
-                  repeat: Infinity,
-                  duration: 2,
-                },
-              }}
-              className="rounded-xl bg-cyan-500/10 p-3"
-            >
-              <ShieldCheck
-                size={30}
-                className="text-cyan-400"
-              />
-            </motion.div>
-
-            <div>
-
-              <h1 className="text-xl font-bold">
-                Secure File Transfer
-              </h1>
-
-              <p className="text-xs text-cyan-300">
-                Military Grade Encryption
-              </p>
-
+    <main className="min-h-screen overflow-hidden bg-white text-slate-950">
+      {/* Navigation */}
+      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
+        <nav className="glass-nav mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl px-4 shadow-sm sm:px-6">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
+              <ShieldCheck className="h-5 w-5" />
             </div>
 
-          </motion.div>
+            <div className="leading-none">
+              <p className="text-sm font-black tracking-[0.18em] text-slate-950">
+                SATIM
+              </p>
+              <p className="mt-1 hidden text-[9px] font-medium uppercase tracking-[0.18em] text-slate-400 sm:block">
+                Academic Security
+              </p>
+            </div>
+          </Link>
 
-          <div className="flex gap-4">
+          <div className="hidden items-center gap-8 md:flex">
+            <a
+              href="#security"
+              className="text-sm font-medium text-slate-500 transition hover:text-slate-950"
+            >
+              Security
+            </a>
+            <a
+              href="#workflow"
+              className="text-sm font-medium text-slate-500 transition hover:text-slate-950"
+            >
+              How It Works
+            </a>
+            <a
+              href="#use-cases"
+              className="text-sm font-medium text-slate-500 transition hover:text-slate-950"
+            >
+              Use Cases
+            </a>
+          </div>
 
+          <div className="flex items-center gap-2">
             <Link
               href="/auth/login"
-              className="rounded-xl border border-cyan-500/30 px-6 py-3 transition hover:bg-cyan-500/10"
+              className="hidden rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:block"
             >
-              Login
+              Sign in
             </Link>
 
             <Link
               href="/auth/register"
-              className="rounded-xl bg-cyan-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400"
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 transition hover:-translate-y-0.5 hover:bg-blue-600"
             >
               Get Started
+              <ArrowRight className="h-4 w-4" />
             </Link>
-
           </div>
-
-        </div>
-
+        </nav>
       </header>
 
-      {/* ========================= */}
-      {/* HERO */}
-      {/* ========================= */}
+      {/* Hero */}
+      <section className="security-grid relative isolate px-4 pb-20 pt-36 sm:px-6 lg:pb-28 lg:pt-44">
+        <div className="absolute inset-x-0 top-0 -z-10 h-[600px] bg-[radial-gradient(circle_at_65%_35%,rgba(37,99,235,0.14),transparent_35%),radial-gradient(circle_at_20%_10%,rgba(15,23,42,0.06),transparent_28%)]" />
 
-      <section className="relative mx-auto flex min-h-screen max-w-7xl items-center px-6 pt-24">
-
-        <div className="grid w-full items-center gap-20 lg:grid-cols-2">
-
-          {/* LEFT SIDE */}
-
-        
-
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-5 py-2 text-cyan-300">
-
-              <ShieldCheck size={18} />
-
-              Secure Transmission Platform
-
+        <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.02fr_0.98fr] lg:gap-20">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+          >
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-600/15 bg-blue-50 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
+              </span>
+              Secure academic infrastructure
             </div>
 
-            <TypeAnimation
-              sequence={[
-                "Secure File Transfer System",
-                2000,
-                "AES-256 Encryption",
-                2000,
-                "SHA-256 Integrity Verification",
-                2000,
-                "Attack Detection & Recovery",
-                2000,
-              ]}
-              wrapper="h1"
-              speed={45}
-              repeat={Infinity}
-              className="text-5xl font-extrabold leading-tight md:text-7xl"
-            />
+            <h1 className="max-w-4xl text-5xl font-black tracking-[-0.045em] text-slate-950 sm:text-6xl lg:text-7xl">
+              Transfer academic documents with{" "}
+              <span className="text-blue-600">security you can verify.</span>
+            </h1>
 
-            <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-300">
-
-              Protect confidential documents using
-              end-to-end encryption, integrity
-              verification, real-time packet monitoring
-              and attack detection built with modern
-              cybersecurity principles.
-
+            <p className="mt-7 max-w-2xl text-base leading-8 text-slate-500 sm:text-lg">
+              SATIM protects sensitive academic documents with encryption,
+              integrity verification, controlled MITM attack simulation and
+              security monitoring — all inside one academic security platform.
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-5">
-
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/auth/register"
-                className="group inline-flex items-center rounded-xl bg-cyan-500 px-8 py-4 font-bold text-slate-950 transition hover:bg-cyan-400"
+                className="group inline-flex items-center justify-center gap-3 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
               >
-                Get Started
-
-                <ArrowRight className="ml-3 transition group-hover:translate-x-2" />
-
+                Start secure transfer
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
               </Link>
 
-              <Link
-                href="/auth/login"
-                className="rounded-xl border border-cyan-500/30 px-8 py-4 hover:bg-cyan-500/10"
+              <a
+                href="#workflow"
+                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50"
               >
-                Sign In
-              </Link>
-
+                Explore how it works
+              </a>
             </div>
 
-                      {/* RIGHT SIDE */}
+            <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-slate-500">
+              {[
+                "AES protected",
+                "SHA-256 verified",
+                "MITM monitored",
+                "Audit logged",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-blue-600" />
+                  {item}
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
+          {/* Security visualization */}
           <motion.div
-            initial={{
-              opacity: 0,
-              x: 80,
-            }}
-            animate={{
-              opacity: 1,
-              x: 0,
-            }}
-            transition={{
-              duration: 1,
-            }}
-            className="relative flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.96, x: 30 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="relative"
           >
+            <div className="absolute -inset-10 rounded-[3rem] bg-blue-500/10 blur-3xl" />
 
-            {/* Glow */}
-
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.25, 0.55, 0.25],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-              }}
-              className="absolute h-[520px] w-[520px] rounded-full bg-cyan-500 blur-[120px]"
-            />
-
-            {/* Radar Sweep */}
-
-            <motion.div
-              animate={{
-                rotate: 360,
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              className="absolute h-[460px] w-[460px] rounded-full"
-              style={{
-                background:
-                  "conic-gradient(from 0deg, transparent 0deg, rgba(34,211,238,.8) 55deg, transparent 90deg)",
-              }}
-            />
-
-            {/* Rings */}
-
-            {[460, 360, 260, 160].map((size) => (
-              <div
-                key={size}
-                className="absolute rounded-full border border-cyan-500/20"
-                style={{
-                  width: size,
-                  height: size,
-                }}
-              />
-            ))}
-
-            {/* Crosshair */}
-
-            <div className="absolute h-[460px] w-px bg-cyan-500/20" />
-            <div className="absolute h-px w-[460px] bg-cyan-500/20" />
-
-            {/* Center */}
-
-            <motion.div
-              animate={{
-                scale: [1, 1.08, 1],
-                rotate: [0, 4, -4, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-              }}
-              className="z-20 rounded-full border border-cyan-500/30 bg-slate-900 p-10 shadow-[0_0_50px_rgba(34,211,238,.5)]"
-            >
-              <ShieldCheck
-                size={80}
-                className="text-cyan-400"
-              />
-            </motion.div>
-
-            {/* Orbit */}
-
-            <motion.div
-              animate={{
-                rotate: 360,
-              }}
-              transition={{
-                duration: 15,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              className="absolute h-[360px] w-[360px]"
-            >
-
-              <div className="absolute left-1/2 -top-5 -translate-x-1/2 rounded-full border border-cyan-500/30 bg-slate-900 p-3">
-                <Lock className="text-cyan-400" />
-              </div>
-
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full border border-cyan-500/30 bg-slate-900 p-3">
-                <FileCheck className="text-cyan-400" />
-              </div>
-
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 rounded-full border border-cyan-500/30 bg-slate-900 p-3">
-                <Wifi className="text-cyan-400" />
-              </div>
-
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 rounded-full border border-cyan-500/30 bg-slate-900 p-3">
-                <Server className="text-cyan-400" />
-              </div>
-
-            </motion.div>
-
-            {/* Status */}
-
-            <motion.div
-              animate={{
-                y: [0, -10, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-              }}
-              className="absolute bottom-6 rounded-xl border border-cyan-500/20 bg-slate-900/80 px-6 py-4 backdrop-blur-xl"
-            >
-
-              <div className="flex items-center gap-3">
-
-                <div className="h-3 w-3 rounded-full bg-green-400 shadow-[0_0_15px_lime]" />
-
-                <span className="text-sm text-cyan-300">
-                  Secure Channel Active
-                </span>
-
-              </div>
-
-              <div className="mt-3 space-y-2 text-sm">
-
-                <div className="flex justify-between gap-8">
-                  <span className="text-slate-400">
-                    Encryption
-                  </span>
-
-                  <span className="font-semibold text-cyan-400">
-                    AES-256
-                  </span>
+            <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_100px_rgba(15,23,42,0.13)]">
+              {/* window header */}
+              <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
                 </div>
 
-                <div className="flex justify-between gap-8">
-                  <span className="text-slate-400">
-                    Integrity
-                  </span>
-
-                  <span className="font-semibold text-cyan-400">
-                    SHA-256
-                  </span>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                  Live security channel
                 </div>
+              </div>
 
-                <div className="flex justify-between gap-8">
-                  <span className="text-slate-400">
-                    Status
-                  </span>
+              <div className="p-5 sm:p-7">
+                <div className="mb-7 flex items-end justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                      Transfer monitor
+                    </p>
+                    <h2 className="mt-2 text-xl font-black tracking-tight">
+                      Document #ST-2841
+                    </h2>
+                  </div>
 
-                  <span className="font-semibold text-green-400">
+                  <span className="status-success">
+                    <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-blue-600" />
                     Protected
                   </span>
                 </div>
 
+                {/* Pipeline */}
+                <div className="relative">
+                  <div className="absolute left-[12%] right-[12%] top-7 hidden h-px bg-slate-200 sm:block" />
+
+                  <div className="grid grid-cols-2 gap-5 sm:grid-cols-5">
+                    {[
+                      {
+                        icon: UserRound,
+                        label: "Sender",
+                        sub: "Staff",
+                        type: "normal",
+                      },
+                      {
+                        icon: LockKeyhole,
+                        label: "Encrypt",
+                        sub: "AES-256",
+                        type: "normal",
+                      },
+                      {
+                        icon: Waypoints,
+                        label: "Transmit",
+                        sub: "In transit",
+                        type: "normal",
+                      },
+                      {
+                        icon: ShieldAlert,
+                        label: "MITM",
+                        sub: "Monitored",
+                        type: "danger",
+                      },
+                      {
+                        icon: FileCheck2,
+                        label: "Verify",
+                        sub: "SHA-256",
+                        type: "normal",
+                      },
+                    ].map((node, index) => {
+                      const Icon = node.icon;
+
+                      return (
+                        <motion.div
+                          key={node.label}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 + index * 0.12 }}
+                          className="relative z-10 flex flex-col items-center text-center"
+                        >
+                          <div
+                            className={
+                              node.type === "danger"
+                                ? "flex h-14 w-14 items-center justify-center rounded-2xl border border-red-200 bg-red-50 text-red-600 shadow-sm"
+                                : "flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600 shadow-sm"
+                            }
+                          >
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <p className="mt-3 text-xs font-bold text-slate-900">
+                            {node.label}
+                          </p>
+                          <p className="mt-1 text-[10px] text-slate-400">
+                            {node.sub}
+                          </p>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Telemetry */}
+                <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                  {[
+                    ["Encryption", "AES-256"],
+                    ["Integrity", "SHA-256"],
+                    ["Detection", "ACTIVE"],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        {label}
+                      </p>
+                      <p className="mt-2 text-sm font-black text-slate-900">
+                        {value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Event */}
+                <div className="mt-3 flex items-center gap-3 rounded-xl border border-red-100 bg-red-50 p-4">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-red-600 shadow-sm">
+                    <ShieldAlert className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-red-800">
+                      MITM simulation layer active
+                    </p>
+                    <p className="mt-0.5 truncate text-[10px] text-red-600/70">
+                      Traffic is being inspected before integrity verification.
+                    </p>
+                  </div>
+                  <div className="ml-auto h-2 w-2 shrink-0 animate-pulse rounded-full bg-red-500" />
+                </div>
               </div>
-
-            </motion.div>
-
+            </div>
           </motion.div>
-
         </div>
-
       </section>
 
-      {/* ========================= */}
-      {/* FEATURES */}
-      {/* ========================= */}
-
-      <section className="mx-auto max-w-7xl px-6 py-24">
-
-        <motion.h2
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-16 text-center text-4xl font-bold"
-        >
-          Enterprise Security Features
-        </motion.h2>
-
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-
-          {[
-            {
-              icon: <Lock className="h-10 w-10 text-cyan-400" />,
-              title: "AES-256 Encryption",
-              desc: "Military-grade encryption protects files before transmission.",
-            },
-            {
-              icon: <FileCheck className="h-10 w-10 text-cyan-400" />,
-              title: "Integrity Verification",
-              desc: "SHA-256 hashing detects any unauthorized modification.",
-            },
-            {
-              icon: <ShieldCheck className="h-10 w-10 text-cyan-400" />,
-              title: "Attack Detection",
-              desc: "Continuously monitors packets during transfer.",
-            },
-            {
-              icon: <Cpu className="h-10 w-10 text-cyan-400" />,
-              title: "Real-Time Monitoring",
-              desc: "Observe every transfer from sender to receiver instantly.",
-            },
-          ].map((feature) => (
-            <motion.div
-              key={feature.title}
-              whileHover={{
-                scale: 1.05,
-                y: -8,
-              }}
-              className="rounded-3xl border border-cyan-500/20 bg-slate-900/60 p-8 backdrop-blur-xl"
-            >
-              {feature.icon}
-
-              <h3 className="mt-6 text-xl font-bold">
-                {feature.title}
-              </h3>
-
-              <p className="mt-4 leading-7 text-slate-400">
-                {feature.desc}
-              </p>
-            </motion.div>
-          ))}
-
+      {/* Security strip */}
+      <section className="border-y border-slate-100 bg-slate-950 px-4 py-5 text-white sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-3 text-center text-xs font-semibold sm:justify-between sm:text-left">
+          <span className="text-slate-400">BUILT FOR ACADEMIC SECURITY</span>
+          <span className="text-white">AES ENCRYPTION</span>
+          <span className="text-white">SHA-256 INTEGRITY</span>
+          <span className="text-red-400">MITM SIMULATION</span>
+          <span className="text-white">SECURITY AUDIT TRAIL</span>
         </div>
-
       </section>
 
-      {/* ========================= */}
-      {/* WORKFLOW */}
-      {/* ========================= */}
+      {/* Security Features */}
+      <section id="security" className="px-4 py-24 sm:px-6 lg:py-32">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-2xl">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-600">
+              Security architecture
+            </p>
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
+            <h2 className="mt-4 text-4xl font-black tracking-[-0.035em] text-slate-950 sm:text-5xl">
+              Protection is not just encryption.
+            </h2>
 
-        <motion.h2
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mb-20 text-center text-4xl font-bold"
-        >
-          Secure Transfer Workflow
-        </motion.h2>
+            <p className="mt-5 text-base leading-8 text-slate-500">
+              SATIM combines confidentiality, integrity verification, controlled
+              attack simulation and monitoring to demonstrate what happens when
+              protected academic traffic is intercepted.
+            </p>
+          </div>
 
-        <div className="grid gap-10 md:grid-cols-5">
+          <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              const danger = feature.tone === "red";
+              const dark = feature.tone === "black";
 
-          {[
-            "Upload",
-            "Encrypt",
-            "Transfer",
-            "Verify",
-            "Download",
-          ].map((step, index) => (
-            <motion.div
-              key={step}
-              whileHover={{
-                scale: 1.08,
-              }}
-              className="rounded-2xl border border-cyan-500/20 bg-slate-900/60 p-8 text-center backdrop-blur"
-            >
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ delay: index * 0.08 }}
+                  whileHover={{ y: -6 }}
+                  className={
+                    dark
+                      ? "premium-card-dark p-7"
+                      : danger
+                        ? "danger-card p-7"
+                        : "security-card p-7"
+                  }
+                >
+                  <div
+                    className={
+                      dark
+                        ? "flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white"
+                        : danger
+                          ? "flex h-11 w-11 items-center justify-center rounded-xl bg-white text-red-600 shadow-sm"
+                          : "flex h-11 w-11 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm"
+                    }
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
 
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-cyan-500 font-bold text-slate-950">
+                  <p
+                    className={
+                      dark
+                        ? "mt-8 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40"
+                        : danger
+                          ? "mt-8 text-[10px] font-bold uppercase tracking-[0.18em] text-red-500"
+                          : "mt-8 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600"
+                    }
+                  >
+                    0{index + 1}
+                  </p>
 
-                {index + 1}
+                  <h3
+                    className={
+                      dark
+                        ? "mt-3 text-xl font-black text-white"
+                        : "mt-3 text-xl font-black text-slate-950"
+                    }
+                  >
+                    {feature.title}
+                  </h3>
 
+                  <p
+                    className={
+                      dark
+                        ? "mt-3 text-sm leading-7 text-white/55"
+                        : "mt-3 text-sm leading-7 text-slate-500"
+                    }
+                  >
+                    {feature.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Workflow */}
+      <section
+        id="workflow"
+        className="security-grid border-y border-slate-100 bg-slate-50 px-4 py-24 sm:px-6 lg:py-32"
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-600">
+              Transfer lifecycle
+            </p>
+
+            <h2 className="mt-4 text-4xl font-black tracking-[-0.035em] text-slate-950 sm:text-5xl">
+              From upload to verification.
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-slate-500">
+              Every stage creates a security event so the system can demonstrate
+              how confidentiality and integrity are maintained during transfer.
+            </p>
+          </div>
+
+          <div className="mt-16 grid gap-4 lg:grid-cols-5">
+            {workflow.map((step, index) => {
+              const Icon = step.icon;
+
+              return (
+                <motion.div
+                  key={step.number}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08 }}
+                  className="relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black tracking-widest text-blue-600">
+                      {step.number}
+                    </span>
+
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white">
+                      <Icon className="h-4 w-4" />
+                    </div>
+                  </div>
+
+                  <h3 className="mt-8 text-lg font-black">{step.title}</h3>
+
+                  <p className="mt-3 text-sm leading-6 text-slate-500">
+                    {step.description}
+                  </p>
+
+                  {index < workflow.length - 1 && (
+                    <div className="absolute -right-3 top-1/2 z-20 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-blue-600 shadow-sm lg:flex">
+                      <ArrowRight className="h-3 w-3" />
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* MITM spotlight */}
+      <section className="bg-slate-950 px-4 py-24 text-white sm:px-6 lg:py-32">
+        <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-red-400">
+              Controlled attack simulation
+            </p>
+
+            <h2 className="mt-5 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
+              What happens when the channel is compromised?
+            </h2>
+
+            <p className="mt-6 max-w-xl text-base leading-8 text-slate-400">
+              Instead of only claiming that a transfer is secure, SATIM provides
+              a controlled MITM simulation where intercepted traffic can be
+              forwarded or modified and the resulting integrity state can be
+              observed.
+            </p>
+
+            <div className="mt-8 space-y-4">
+              {[
+                "Original SHA-256 hash is recorded.",
+                "Traffic passes through the simulation layer.",
+                "The received document is hashed again.",
+                "Hash mismatch exposes unauthorized modification.",
+              ].map((item, index) => (
+                <div key={item} className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-xs font-bold text-red-400">
+                    {index + 1}
+                  </div>
+                  <p className="text-sm leading-6 text-slate-300">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 rounded-[2rem] bg-red-500/10 blur-3xl" />
+
+            <div className="relative rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl sm:p-7">
+              <div className="flex items-center justify-between border-b border-white/10 pb-5">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
+                    Attack simulation
+                  </p>
+                  <p className="mt-2 font-bold">Transfer inspection</p>
+                </div>
+
+                <span className="status-danger">INTERCEPTED</span>
               </div>
 
-              <h3 className="text-xl font-bold">
-                {step}
-              </h3>
+              <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                <div className="flex-1 rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <p className="text-[10px] uppercase tracking-wider text-white/40">
+                    Original
+                  </p>
+                  <p className="mt-3 font-mono text-xs text-white/70">
+                    SHA256
+                  </p>
+                  <p className="mt-2 truncate font-mono text-[10px] text-blue-300">
+                    8f31...c91a
+                  </p>
+                </div>
 
-            </motion.div>
-          ))}
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-full border border-red-500/30 bg-red-500/10 text-red-400">
+                  <ShieldAlert className="h-4 w-4" />
+                </div>
 
+                <div className="flex-1 rounded-2xl border border-red-500/20 bg-red-500/5 p-5">
+                  <p className="text-[10px] uppercase tracking-wider text-red-400/70">
+                    Received
+                  </p>
+                  <p className="mt-3 font-mono text-xs text-white/70">
+                    SHA256
+                  </p>
+                  <p className="mt-2 truncate font-mono text-[10px] text-red-300">
+                    b42d...7e10
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3">
+                <ShieldAlert className="h-4 w-4 text-red-400" />
+                <span className="text-xs font-semibold text-red-300">
+                  Integrity mismatch detected — document compromised
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-
       </section>
 
-      {/* ========================= */}
-      {/* STATS */}
-      {/* ========================= */}
-
-      <section className="mx-auto max-w-7xl px-6 py-24">
-
-        <div className="grid gap-8 md:grid-cols-4">
-
-          {[
-            ["AES-256", "Encryption"],
-            ["SHA-256", "Integrity"],
-            ["24/7", "Monitoring"],
-            ["100%", "Protection"],
-          ].map(([value, label]) => (
-
-            <motion.div
-              key={label}
-              whileHover={{
-                scale: 1.05,
-              }}
-              className="rounded-3xl border border-cyan-500/20 bg-slate-900/60 p-10 text-center backdrop-blur-xl"
-            >
-
-              <h3 className="text-5xl font-black text-cyan-400">
-                {value}
-              </h3>
-
-              <p className="mt-4 text-slate-400">
-                {label}
+      {/* Use cases */}
+      <section id="use-cases" className="px-4 py-24 sm:px-6 lg:py-32">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-600">
+                Built for the institution
               </p>
 
-            </motion.div>
+              <h2 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
+                Sensitive academic information deserves visibility.
+              </h2>
 
-          ))}
+              <p className="mt-5 text-base leading-8 text-slate-500">
+                SATIM provides a practical environment for demonstrating secure
+                document exchange within an academic institution.
+              </p>
+            </div>
 
+            <div className="grid gap-3 sm:grid-cols-2">
+              {useCases.map((item, index) => (
+                <motion.div
+                  key={item}
+                  whileHover={{ x: 4 }}
+                  className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      0{index + 1}
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-slate-900">
+                      {item}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
-
       </section>
 
-      {/* ========================= */}
       {/* CTA */}
-      {/* ========================= */}
-
-      <section className="mx-auto max-w-5xl px-6 py-24">
-
+      <section className="px-4 pb-20 sm:px-6 lg:pb-28">
         <motion.div
-          whileHover={{
-            scale: 1.02,
-          }}
-          className="rounded-3xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-slate-900 p-14 text-center"
+          whileHover={{ y: -3 }}
+          className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-blue-600 px-6 py-14 text-white shadow-2xl shadow-blue-600/20 sm:px-10 lg:px-16 lg:py-20"
         >
+          <div className="relative z-10 flex flex-col justify-between gap-10 lg:flex-row lg:items-center">
+            <div className="max-w-2xl">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-100">
+                Secure the transfer
+              </p>
 
-          <h2 className="text-5xl font-bold">
-            Ready to Secure Your Files?
-          </h2>
+              <h2 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
+                Make document integrity visible.
+              </h2>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300">
-            Experience encrypted file sharing with
-            integrity verification and real-time
-            monitoring.
-          </p>
-
-          <div className="mt-10 flex flex-wrap justify-center gap-5">
+              <p className="mt-5 max-w-xl text-sm leading-7 text-blue-100 sm:text-base">
+                Upload a document, select an authorized receiver and observe
+                the complete security lifecycle.
+              </p>
+            </div>
 
             <Link
               href="/auth/register"
-              className="rounded-xl bg-cyan-500 px-10 py-4 font-bold text-slate-950 transition hover:bg-cyan-400"
+              className="group inline-flex shrink-0 items-center justify-center gap-3 rounded-xl bg-white px-6 py-4 text-sm font-black text-blue-700 shadow-xl transition hover:-translate-y-0.5 hover:bg-slate-50"
             >
-              Create Account
+              Create secure account
+              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
             </Link>
-
-            <Link
-              href="/auth/login"
-              className="rounded-xl border border-cyan-500/30 px-10 py-4 hover:bg-cyan-500/10"
-            >
-              Login
-            </Link>
-
           </div>
-
         </motion.div>
-
       </section>
 
-      {/* ========================= */}
-      {/* FOOTER */}
-      {/* ========================= */}
+      {/* Footer */}
+      <footer className="border-t border-slate-100 px-4 py-10 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-950 text-white">
+              <ShieldCheck className="h-4 w-4" />
+            </div>
 
-      <footer className="border-t border-cyan-500/10 py-10 text-center">
+            <div>
+              <p className="text-sm font-black tracking-[0.14em]">SATIM</p>
+              <p className="text-[10px] text-slate-400">
+                Secure Academic Transfer & Integrity Monitoring
+              </p>
+            </div>
+          </div>
 
-        <h2 className="text-xl font-bold">
-          Secure File Transfer System
-        </h2>
-
-        <p className="mt-3 text-slate-400">
-          Final Year Project • Computer Science with Statistics
-        </p>
-
-        <p className="mt-2 text-slate-500">
-          Built with Next.js • Prisma • PostgreSQL • AES-256 • SHA-256
-        </p>
-
+          <div className="text-left text-xs text-slate-400 sm:text-right">
+            <p>Computer Science with Statistics</p>
+            <p className="mt-1">
+              Next.js · Prisma · PostgreSQL · AES · SHA-256
+            </p>
+          </div>
+        </div>
       </footer>
-
     </main>
   );
 }

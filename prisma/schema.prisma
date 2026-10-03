@@ -8,13 +8,16 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  fullName      String
-  email         String         @unique
-  password      String
-  role          Role           @default(USER)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id         String   @id @default(cuid())
+  fullName   String
+  email      String   @unique
+  password   String
+  role       Role     @default(USER)
+  department String?
+  isBlocked  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
   receivedFiles FileTransfer[] @relation("Receiver")
   sentFiles     FileTransfer[] @relation("Sender")
   notifications Notification[]
@@ -22,25 +25,43 @@ model User {
 }
 
 model FileTransfer {
-  id            String         @id @default(cuid())
-  fileName      String
-  fileSize      Int
-  fileType      String
-  encrypted     Boolean        @default(true)
-  hash          String
+  id String @id @default(cuid())
+
+  fileName   String
+  fileSize   Int
+  fileType   String
+  storedName String
+  filePath   String
+
+  documentType    DocumentType         @default(OTHER)
+  department      String?
+  confidentiality ConfidentialityLevel @default(CONFIDENTIAL)
+  description     String?
+
+  encrypted   Boolean         @default(true)
+  hash        String
+  currentHash String?
+  integrity   IntegrityStatus @default(PENDING)
+
   downloadCount Int            @default(0)
   status        TransferStatus @default(PENDING)
   senderId      String
   receiverId    String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  filePath      String
-  iv            String?
   receiverEmail String
-  storedName    String
-  receiver      User?          @relation("Receiver", fields: [receiverId], references: [id])
-  sender        User           @relation("Sender", fields: [senderId], references: [id])
-  securityLogs  SecurityLog[]
+
+  attackAction  AttackAction @default(NONE)
+  interceptedAt DateTime?
+  verifiedAt    DateTime?
+
+  batchId String?
+  iv      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  receiver     User?         @relation("Receiver", fields: [receiverId], references: [id])
+  sender       User          @relation("Sender", fields: [senderId], references: [id])
+  securityLogs SecurityLog[]
 }
 
 model Notification {
@@ -50,7 +71,8 @@ model Notification {
   isRead    Boolean  @default(false)
   userId    String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model SecurityLog {
@@ -59,17 +81,54 @@ model SecurityLog {
   attackDetected Boolean       @default(false)
   securityLevel  SecurityLevel
   description    String
-  userId         String
-  transferId     String
-  createdAt      DateTime      @default(now())
-  transfer       FileTransfer  @relation(fields: [transferId], references: [id])
-  user           User          @relation(fields: [userId], references: [id])
+
+  userId     String
+  transferId String
+  createdAt  DateTime      @default(now())
+
+  transfer FileTransfer @relation(fields: [transferId], references: [id])
+  user     User         @relation(fields: [userId], references: [id])
 }
 
 enum Role {
   USER
   ADMIN
   ATTACKER
+  LECTURER
+  HOD
+  EXAM_OFFICER
+}
+
+enum DocumentType {
+  EXAMINATION
+  RESULT
+  PROJECT
+  ASSIGNMENT
+  STUDENT_RECORD
+  DEPARTMENTAL
+  ADMINISTRATIVE
+  RESEARCH
+  OTHER
+}
+
+enum ConfidentialityLevel {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  HIGHLY_CONFIDENTIAL
+}
+
+enum IntegrityStatus {
+  PENDING
+  VERIFIED
+  COMPROMISED
+}
+
+enum AttackAction {
+  NONE
+  FORWARDED
+  MODIFIED
+  BLOCKED
 }
 
 enum TransferStatus {
