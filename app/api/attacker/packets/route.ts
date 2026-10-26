@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -10,60 +9,49 @@ export async function GET() {
 
     if (!session?.user) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { success: false, error: "Unauthorized", statistics: null, packets: [] },
         { status: 401 }
       );
     }
 
     if (session.user.role !== "ATTACKER") {
       return NextResponse.json(
-        { error: "Forbidden" },
+        { success: false, error: "Forbidden", statistics: null, packets: [] },
         { status: 403 }
       );
     }
 
     const packets = await prisma.fileTransfer.findMany({
-      where: {
-        status: "IN_TRANSIT",
-      },
+      where: { status: "IN_TRANSIT" },
       include: {
         sender: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-          },
+          select: { id: true, fullName: true, email: true },
         },
         receiver: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-          },
+          select: { id: true, fullName: true, email: true },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
-
-    const totalPackets = packets.length;
 
     const encryptedPackets = packets.filter(
       (packet) => packet.encrypted
     ).length;
 
-    const plainPackets = totalPackets - encryptedPackets;
-
-    return NextResponse.json({
-      success: true,
-      statistics: {
-        totalPackets,
-        encryptedPackets,
-        plainPackets,
+    return NextResponse.json(
+      {
+        success: true,
+        statistics: {
+          totalPackets: packets.length,
+          encryptedPackets,
+          plainPackets: packets.length - encryptedPackets,
+        },
+        packets,
       },
-      packets,
-    });
+      {
+        headers: { "Cache-Control": "no-store, max-age=0" },
+      }
+    );
   } catch (error) {
     console.error("Packet API Error:", error);
 
@@ -71,10 +59,14 @@ export async function GET() {
       {
         success: false,
         error: "Failed to load intercepted packets.",
+        statistics: {
+          totalPackets: 0,
+          encryptedPackets: 0,
+          plainPackets: 0,
+        },
+        packets: [],
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }

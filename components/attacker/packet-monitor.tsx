@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 
@@ -71,7 +71,7 @@ export default function PacketMonitor() {
         <div className="rounded-xl bg-zinc-900 border border-zinc-800 p-6">
           <h3 className="text-zinc-400 text-sm">Packets</h3>
           <p className="text-4xl font-bold text-white mt-2">
-            {data?.statistics.totalPackets}
+            {data?.statistics?.totalPackets ?? 0}
           </p>
         </div>
 
@@ -81,7 +81,7 @@ export default function PacketMonitor() {
           </h3>
 
           <p className="text-4xl font-bold text-green-500 mt-2">
-            {data?.statistics.encryptedPackets}
+            {data?.statistics?.encryptedPackets ?? 0}
           </p>
         </div>
 
@@ -91,14 +91,14 @@ export default function PacketMonitor() {
           </h3>
 
           <p className="text-4xl font-bold text-yellow-400 mt-2">
-            {data?.statistics.plainPackets}
+            {data?.statistics?.plainPackets ?? 0}
           </p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-zinc-800 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-zinc-900">
+      <div className="overflow-x-auto rounded-2xl border border-slate-700 bg-slate-950/70 shadow-xl">
+        <table className="w-full min-w-[760px] text-left text-sm text-slate-200">
+          <thead className="bg-slate-900 text-xs uppercase tracking-wider text-slate-400">
             <tr className="text-left">
               <th className="p-4">File</th>
               <th>Sender</th>
@@ -123,7 +123,7 @@ export default function PacketMonitor() {
               data?.packets.map((packet) => (
                 <tr
                   key={packet.id}
-                  className="border-t border-zinc-800"
+                  className="border-t border-slate-800 transition-colors hover:bg-white/[0.04]"
                 >
                   <td className="p-4 font-medium">
                     {packet.fileName}
@@ -139,9 +139,7 @@ export default function PacketMonitor() {
 
                   <td>
                     {packet.encrypted ? (
-                      <span className="text-green-500">
-                        ðŸ”’ AES-256
-                      </span>
+                      <span className="font-semibold text-emerald-400">AES-256 Encrypted</span>
                     ) : (
                       <span className="text-yellow-500">
                         âŒ Plain

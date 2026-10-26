@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
@@ -34,6 +34,9 @@ export async function POST(req: NextRequest) {
     const transfer = await prisma.fileTransfer.findUnique({
       where: {
         id: transferId,
+      },
+      include: {
+        sender: true,
       },
     });
 
@@ -118,12 +121,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await prisma.notification.create({
-      data: {
-        userId: transfer.senderId,
-        title: "Security Alert",
-        message: `Your document "${transfer.fileName}" was intercepted by the MITM simulation and forwarded without modification. SHA-256 integrity verification passed.`,
-      },
+    await prisma.notification.createMany({
+      data: [
+        {
+          userId: transfer.senderId,
+          title: "Document Forwarded",
+          message: `"${transfer.fileName}" was forwarded. Integrity: ${finalTransfer.integrity}.`,
+        },
+        ...(transfer.receiverId
+          ? [{
+              userId: transfer.receiverId,
+              title: "Incoming Academic Document",
+              message: `"${transfer.fileName}" from ${transfer.sender.fullName} has arrived. Integrity: ${finalTransfer.integrity}.`,
+            }]
+          : []),
+      ],
     });
 
     return NextResponse.json({

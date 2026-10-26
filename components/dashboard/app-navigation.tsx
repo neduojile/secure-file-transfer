@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -240,13 +240,13 @@ export default function AppNavigation() {
                 duration: 0.3,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="fixed left-4 top-[92px] z-[110] w-[calc(100vw-32px)] max-w-[420px] overflow-hidden rounded-[30px] border border-white/80 bg-white/95 shadow-[0_35px_100px_rgba(15,23,42,0.25)] backdrop-blur-3xl sm:left-6 sm:w-[420px] lg:left-8"
+              className="fixed left-4 top-[92px] z-[110] w-[calc(100vw-32px)] max-w-[390px] max-h-[calc(100dvh-108px)] flex flex-col overflow-hidden rounded-[26px] border border-white/80 bg-white/95 shadow-[0_35px_100px_rgba(15,23,42,0.25)] backdrop-blur-3xl sm:left-6 sm:w-[420px] lg:left-8"
             >
               {/* ambient glow */}
               <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-blue-500/10 blur-[80px]" />
               <div className="pointer-events-none absolute -bottom-32 -left-20 h-64 w-64 rounded-full bg-indigo-500/10 blur-[80px]" />
 
-              <div className="relative">
+              <div className="relative flex min-h-0 flex-1 flex-col">
                 
                 {/* HEADER */}
                 <div className="flex items-start justify-between border-b border-slate-100 px-6 pb-5 pt-6">
@@ -274,7 +274,7 @@ export default function AppNavigation() {
                 </div>
 
                 {/* NAVIGATION */}
-                <div className="space-y-1 px-3 py-4">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain space-y-1 px-3 py-2">
                   {navigation.map((item, index) => {
                     const Icon = item.icon;
 
@@ -295,7 +295,7 @@ export default function AppNavigation() {
                       >
                         <Link
                           href={item.href}
-                          className={`group relative flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-all duration-300 ${
+                          className={`group relative flex items-center gap-3 rounded-xl px-3 py-2 transition-all duration-300 ${
                             active
                               ? "bg-blue-50 shadow-[inset_0_0_0_1px_rgba(37,99,235,0.10)]"
                               : "hover:bg-slate-50"
@@ -310,7 +310,7 @@ export default function AppNavigation() {
                           )}
 
                           <span
-                            className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-all duration-300 ${
+                            className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition-all duration-300 ${
                               active
                                 ? "bg-blue-600 text-white shadow-[0_10px_25px_rgba(37,99,235,0.28)]"
                                 : "bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600"
@@ -353,8 +353,8 @@ export default function AppNavigation() {
                 </div>
 
                 {/* SYSTEM STATUS */}
-                <div className="px-4 pb-4">
-                  <div className="relative overflow-hidden rounded-[22px] border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4">
+                <div className="shrink-0 px-3 pb-2">
+                  <div className="relative overflow-hidden rounded-[22px] border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-2.5">
                     <div className="absolute right-[-30px] top-[-35px] h-28 w-28 rounded-full bg-blue-500/10 blur-2xl" />
 
                     <div className="relative flex items-center gap-3">
@@ -385,7 +385,7 @@ export default function AppNavigation() {
                 </div>
 
                 {/* FOOTER */}
-                <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3">
+                <div className="shrink-0 flex items-center justify-between border-t border-slate-100 bg-white/95 px-4 py-2">
                   <button
                     type="button"
                     onClick={handleSignOut}

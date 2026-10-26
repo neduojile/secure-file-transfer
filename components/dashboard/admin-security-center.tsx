@@ -1,4 +1,5 @@
 "use client";
+import AdminUserManagement from "@/components/dashboard/admin-user-management";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
@@ -116,7 +117,7 @@ function formatBytes(bytes: number) {
 }
 
 function formatTime(value: string | null) {
-  if (!value) return "—";
+  if (!value) return "â€”";
 
   return new Date(value).toLocaleTimeString([], {
     hour: "2-digit",
@@ -197,26 +198,26 @@ function Stat({
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] ${tones[tone]}`}
+      className={`group relative isolate overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_18px_rgba(15,23,42,0.035)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/40 hover:bg-[#151F2D] hover:shadow-xl hover:shadow-black/20 ${tones[tone]}`}
     >
-      <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-current opacity-[0.04] blur-2xl" />
+      <div className="pointer-events-none absolute -right-8 -top-8 -z-10 h-24 w-24 rounded-full bg-current opacity-[0.05] blur-2xl" />
 
       <div className="flex items-start justify-between">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-current/10">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-current/10 bg-current/[0.07]">
           {icon}
         </div>
 
-        <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-600">
+        <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
           Live
         </span>
       </div>
 
-      <div className="mt-5 text-3xl font-black tracking-tight text-white">
+      <div className="mt-6 text-4xl font-extrabold tracking-tight text-slate-100">
         {value}
       </div>
 
-      <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+      <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
         {label}
       </div>
     </div>
@@ -249,7 +250,7 @@ function PipelineNode({
               ? "border-blue-400/60 bg-blue-500/10 text-blue-300 shadow-[0_0_30px_rgba(59,130,246,0.18)]"
               : complete
                 ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-                : "border-slate-800 bg-slate-950 text-slate-700",
+                : "border-slate-800 bg-slate-950 text-slate-400",
         ].join(" ")}
       >
         {icon}
@@ -271,13 +272,13 @@ function PipelineNode({
               ? "text-blue-300"
               : complete
                 ? "text-emerald-400"
-                : "text-slate-600"
+                : "text-slate-400"
         }`}
       >
         {label}
       </p>
 
-      <p className="mt-1 text-center text-[9px] text-slate-700">{sub}</p>
+      <p className="mt-1 text-center text-[9px] text-slate-400">{sub}</p>
     </div>
   );
 }
@@ -336,6 +337,7 @@ export default function AdminSecurityCenter() {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activePage, setActivePage] = useState("overview");
 
   async function loadSecurityData() {
     try {
@@ -398,12 +400,12 @@ export default function AdminSecurityCenter() {
   const stats = data?.statistics;
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#05070b] text-white">
+    <main className="min-h-screen overflow-hidden bg-[#0B1018] text-slate-100">
       {/* Ambient security field */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-[8%] top-[-15%] h-[520px] w-[520px] rounded-full bg-blue-600/[0.07] blur-[140px]" />
-        <div className="absolute right-[-8%] top-[15%] h-[460px] w-[460px] rounded-full bg-indigo-500/[0.05] blur-[130px]" />
-        <div className="absolute bottom-[-20%] left-[35%] h-[500px] w-[500px] rounded-full bg-cyan-500/[0.035] blur-[150px]" />
+        <div className="absolute left-[8%] top-[-15%] h-[520px] w-[520px] rounded-full bg-blue-500/[0.045] blur-[140px]" />
+        <div className="absolute right-[-8%] top-[15%] h-[460px] w-[460px] rounded-full bg-indigo-500/[0.035] blur-[130px]" />
+        <div className="absolute bottom-[-20%] left-[35%] h-[500px] w-[500px] rounded-full bg-cyan-500/[0.025] blur-[150px]" />
 
         <div
           className="absolute inset-0 opacity-[0.035]"
@@ -415,9 +417,57 @@ export default function AdminSecurityCenter() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-[1900px] space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <div className="relative mx-auto flex min-h-screen max-w-[2000px]">
+        <aside className="sticky top-0 hidden h-screen w-[250px] shrink-0 flex-col border-r border-slate-800/90 bg-[#0A0F17]/95 px-4 py-6 backdrop-blur-xl lg:flex">
+          <a href="/admin" className="mb-8 flex items-center gap-3 rounded-xl px-2 py-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-sm font-black text-blue-400">S</span>
+            <span>
+              <span className="block text-sm font-extrabold tracking-[0.18em] text-slate-100">SATIM</span>
+              <span className="mt-1 block text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500">Admin workspace</span>
+            </span>
+          </a>
+
+          <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Security operations</p>
+          <nav className="flex flex-col gap-1">
+            {[
+              { id: "overview", label: "Command Center", index: 0 },
+              { id: "pipeline", label: "Transfer Pipeline", index: 1 },
+              { id: "transfers", label: "Transfer Registry", index: 2 },
+              { id: "attacks", label: "Attack Intelligence", index: 3 },
+              { id: "forensics", label: "Forensics & Integrity", index: 4 },
+              { id: "events", label: "Live Event Stream", index: 5 },
+            ].map((item, index) => (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => {
+                  const headings = document.querySelectorAll("h2");
+                  headings[item.index]?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[12px] font-semibold transition-colors ${
+                  index === 0
+                    ? "border border-blue-500/20 bg-blue-500/10 text-blue-300"
+                    : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-100"
+                }`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${activePage === item.id ? "bg-blue-400" : "bg-slate-600 group-hover:bg-blue-400"}`} />
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="mt-auto rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-3">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
+              <span className="text-[11px] font-bold text-emerald-300">Monitoring workspace</span>
+            </div>
+            <p className="mt-2 text-[10px] leading-5 text-slate-500">Live security telemetry and document integrity monitoring.</p>
+          </div>
+        </aside>
+
+        <div className="min-w-0 flex-1 space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         {/* COMMAND HEADER */}
-        <header className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-slate-950/80 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl lg:p-8">
+        <header className="relative overflow-hidden rounded-2xl border border-slate-800 bg-[#111925] p-6 shadow-2xl shadow-black/20 sm:p-8" style={{ display: activePage === "overview" ? undefined : 'none' }}>
           <div className="absolute right-[-100px] top-[-100px] h-72 w-72 rounded-full bg-blue-500/[0.08] blur-[80px]" />
 
           <div className="relative flex flex-col justify-between gap-7 xl:flex-row xl:items-end">
@@ -428,26 +478,26 @@ export default function AdminSecurityCenter() {
                   Command Center Online
                 </span>
 
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-700">
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">
                   SATIM / ADMIN / SOC-01
                 </span>
               </div>
 
-              <h1 className="max-w-4xl text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+              <h1 className="max-w-4xl text-3xl font-extrabold tracking-tight text-slate-100 sm:text-4xl lg:text-5xl">
                 Academic Security
-                <span className="block bg-gradient-to-r from-blue-400 via-cyan-300 to-white bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-blue-400 via-cyan-300 to-slate-100 bg-clip-text text-transparent">
                   Command Center
                 </span>
               </h1>
 
-              <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-500">
+              <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-400">
                 Real-time supervision of encrypted academic document
                 transmission, MITM interception activity and SHA-256 integrity
                 verification.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.025] px-4 py-3">
+            <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-[#0C131D] px-4 py-3">
               <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
                 <Radio className="h-4 w-4" />
                 <span className="absolute inset-0 animate-ping rounded-xl border border-emerald-400/20" />
@@ -457,7 +507,7 @@ export default function AdminSecurityCenter() {
                 <p className="text-[10px] font-black uppercase tracking-[0.15em] text-emerald-400">
                   Network Monitor
                 </p>
-                <p className="mt-1 text-[10px] text-slate-600">
+                <p className="mt-1 text-[10px] text-slate-400">
                   {lastUpdated
                     ? `Updated ${lastUpdated.toLocaleTimeString()}`
                     : "Establishing telemetry..."}
@@ -465,14 +515,14 @@ export default function AdminSecurityCenter() {
               </div>
 
               <RefreshCw
-                className={`ml-3 h-4 w-4 text-slate-600 ${
+                className={`ml-3 h-4 w-4 text-slate-400 ${
                   loading ? "animate-spin" : ""
                 }`}
               />
             </div>
           </div>
 
-          <div className="relative mt-7 grid grid-cols-2 gap-2 border-t border-white/[0.06] pt-5 sm:grid-cols-4 lg:grid-cols-6">
+          <div className="relative mt-7 grid grid-cols-2 gap-4 border-t border-slate-800 pt-5 sm:grid-cols-3 lg:grid-cols-6">
             {[
               ["ENCRYPTION", "AES"],
               ["INTEGRITY", "SHA-256"],
@@ -482,7 +532,7 @@ export default function AdminSecurityCenter() {
               ["STATUS", "OPERATIONAL"],
             ].map(([label, value]) => (
               <div key={label}>
-                <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-700">
+                <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">
                   {label}
                 </p>
                 <p className="mt-1 text-[10px] font-bold text-slate-400">
@@ -494,7 +544,7 @@ export default function AdminSecurityCenter() {
         </header>
 
         {/* METRICS */}
-        <section className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" style={{ display: activePage === "overview" ? undefined : 'none' }}>
           <Stat
             label="Total Transfers"
             value={stats?.totalTransfers || 0}
@@ -545,8 +595,8 @@ export default function AdminSecurityCenter() {
         </section>
 
         {/* LIVE TRANSFER */}
-        <section className="overflow-hidden rounded-[28px] border border-white/[0.08] bg-slate-950/80 shadow-2xl shadow-black/20">
-          <div className="flex flex-col justify-between gap-4 border-b border-white/[0.06] p-5 sm:p-6 lg:flex-row lg:items-center">
+        <section className="overflow-hidden rounded-2xl border border-slate-800 bg-[#111925] shadow-xl shadow-black/10 transition-colors duration-300 hover:border-slate-700">
+          <div className="flex flex-col justify-between gap-4 border-b border-slate-800/90 p-5 sm:p-6 lg:flex-row lg:items-center">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
                 <Network className="h-5 w-5" />
@@ -560,7 +610,7 @@ export default function AdminSecurityCenter() {
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" />
                 </div>
 
-                <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-600">
+                <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">
                   Real-time transmission topology
                 </p>
               </div>
@@ -583,9 +633,9 @@ export default function AdminSecurityCenter() {
           <div className="p-5 sm:p-7 lg:p-10">
             {selectedTransfer ? (
               <>
-                <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-white/[0.06] bg-black/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-slate-800 bg-black/20 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-700">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
                       Selected Transmission
                     </p>
                     <p className="mt-1 truncate text-sm font-bold text-white">
@@ -593,11 +643,11 @@ export default function AdminSecurityCenter() {
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-600">
+                  <div className="flex flex-wrap items-center gap-2 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">
                     <span>{selectedTransfer.documentType}</span>
-                    <span className="text-slate-800">•</span>
+                    <span className="text-slate-800">â€¢</span>
                     <span>{formatBytes(selectedTransfer.fileSize)}</span>
-                    <span className="text-slate-800">•</span>
+                    <span className="text-slate-800">â€¢</span>
                     <span>{selectedTransfer.confidentiality}</span>
                   </div>
                 </div>
@@ -693,13 +743,13 @@ export default function AdminSecurityCenter() {
               </>
             ) : (
               <div className="flex min-h-[220px] flex-col items-center justify-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/[0.06] bg-white/[0.02] text-slate-700">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-800 bg-white/[0.02] text-slate-400">
                   <Network className="h-7 w-7" />
                 </div>
-                <p className="mt-4 text-sm font-bold text-slate-500">
+                <p className="mt-4 text-sm font-bold text-slate-400">
                   No transfer telemetry available
                 </p>
-                <p className="mt-1 text-xs text-slate-700">
+                <p className="mt-1 text-xs text-slate-400">
                   New transmissions will appear here automatically.
                 </p>
               </div>
@@ -708,10 +758,10 @@ export default function AdminSecurityCenter() {
         </section>
 
         {/* INTELLIGENCE GRID */}
-        <div className="grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
+        <div className="grid gap-6 xl:grid-cols-[1.15fr_.85fr]" style={{ display: (activePage === "transfers" || activePage === "attacks") ? undefined : 'none' }}>
           {/* TRANSFER REGISTRY */}
-          <section className="overflow-hidden rounded-[28px] border border-white/[0.08] bg-slate-950/80">
-            <div className="flex items-center justify-between border-b border-white/[0.06] p-5 sm:p-6">
+          <section className="overflow-hidden rounded-2xl border border-slate-800 bg-[#111925] shadow-xl shadow-black/10 transition-colors duration-300 hover:border-slate-700" style={{ display: activePage === "transfers" ? undefined : 'none' }}>
+            <div className="flex items-center justify-between border-b border-slate-800/90 p-5 sm:p-6">
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-400">
                   Transmission Registry
@@ -721,7 +771,7 @@ export default function AdminSecurityCenter() {
                 </h2>
               </div>
 
-              <span className="rounded-full border border-white/[0.07] px-3 py-1 text-[9px] font-bold text-slate-600">
+              <span className="rounded-full border border-white/[0.07] px-3 py-1 text-[9px] font-bold text-slate-400">
                 {transfers.length} RECORDS
               </span>
             </div>
@@ -744,7 +794,7 @@ export default function AdminSecurityCenter() {
                     className={`group flex w-full items-center gap-4 px-5 py-4 text-left transition-all sm:px-6 ${
                       selected
                         ? "bg-blue-500/[0.06]"
-                        : "hover:bg-white/[0.025]"
+                        : "hover:bg-slate-800/60"
                     }`}
                   >
                     <div
@@ -771,12 +821,12 @@ export default function AdminSecurityCenter() {
                           {transfer.fileName}
                         </p>
 
-                        <span className="w-fit rounded border border-white/[0.06] px-1.5 py-0.5 text-[8px] font-bold uppercase text-slate-600">
+                        <span className="w-fit rounded border border-slate-800 px-1.5 py-0.5 text-[8px] font-bold uppercase text-slate-400">
                           {transfer.documentType}
                         </span>
                       </div>
 
-                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-slate-700">
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[9px] text-slate-400">
                         <span>{transfer.sender.fullName}</span>
                         <span>{formatBytes(transfer.fileSize)}</span>
                         <span>{formatTime(transfer.createdAt)}</span>
@@ -807,7 +857,7 @@ export default function AdminSecurityCenter() {
                       className={`h-4 w-4 shrink-0 transition ${
                         selected
                           ? "translate-x-1 text-blue-400"
-                          : "text-slate-800 group-hover:text-slate-500"
+                          : "text-slate-800 group-hover:text-slate-400"
                       }`}
                     />
                   </button>
@@ -815,7 +865,7 @@ export default function AdminSecurityCenter() {
               })}
 
               {transfers.length === 0 && (
-                <div className="p-10 text-center text-xs text-slate-700">
+                <div className="p-10 text-center text-xs text-slate-400">
                   No transfer records available.
                 </div>
               )}
@@ -823,8 +873,8 @@ export default function AdminSecurityCenter() {
           </section>
 
           {/* ATTACK INTELLIGENCE */}
-          <section className="overflow-hidden rounded-[28px] border border-white/[0.08] bg-slate-950/80">
-            <div className="border-b border-white/[0.06] p-5 sm:p-6">
+          <section className="overflow-hidden rounded-2xl border border-slate-800 bg-[#111925] shadow-xl shadow-black/10 transition-colors duration-300 hover:border-slate-700" style={{ display: activePage === "attacks" ? undefined : 'none' }}>
+            <div className="border-b border-slate-800/90 p-5 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-[0.2em] text-red-400">
@@ -847,7 +897,7 @@ export default function AdminSecurityCenter() {
                   <p className="text-xl font-black text-red-400">
                     {activeAttacks.length}
                   </p>
-                  <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-700">
+                  <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-400">
                     Signals
                   </p>
                 </div>
@@ -856,7 +906,7 @@ export default function AdminSecurityCenter() {
                   <p className="text-xl font-black text-amber-400">
                     {stats?.modified || 0}
                   </p>
-                  <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-700">
+                  <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-400">
                     Modified
                   </p>
                 </div>
@@ -865,7 +915,7 @@ export default function AdminSecurityCenter() {
                   <p className="text-xl font-black text-emerald-400">
                     {stats?.forwarded || 0}
                   </p>
-                  <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-700">
+                  <p className="mt-1 text-[8px] font-bold uppercase tracking-wider text-slate-400">
                     Forwarded
                   </p>
                 </div>
@@ -888,13 +938,13 @@ export default function AdminSecurityCenter() {
                       <p className="truncate text-[10px] font-bold text-slate-300">
                         {transfer.fileName}
                       </p>
-                      <p className="mt-0.5 text-[8px] uppercase tracking-wider text-slate-700">
-                        {transfer.attackAction} ·{" "}
+                      <p className="mt-0.5 text-[8px] uppercase tracking-wider text-slate-400">
+                        {transfer.attackAction} Â·{" "}
                         {formatTime(transfer.interceptedAt)}
                       </p>
                     </div>
 
-                    <ArrowRight className="h-3.5 w-3.5 text-slate-700 group-hover:text-red-400" />
+                    <ArrowRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-red-400" />
                   </button>
                 ))}
 
@@ -904,7 +954,7 @@ export default function AdminSecurityCenter() {
                     <p className="mt-3 text-xs font-bold text-emerald-400">
                       No active threat signals
                     </p>
-                    <p className="mt-1 text-[9px] text-slate-700">
+                    <p className="mt-1 text-[9px] text-slate-400">
                       The monitored transfer perimeter is clear.
                     </p>
                   </div>
@@ -916,8 +966,8 @@ export default function AdminSecurityCenter() {
 
         {/* SELECTED TRANSFER FORENSICS */}
         {selectedTransfer && (
-          <section className="overflow-hidden rounded-[28px] border border-white/[0.08] bg-slate-950/80">
-            <div className="flex flex-col justify-between gap-4 border-b border-white/[0.06] p-5 sm:p-6 lg:flex-row lg:items-center">
+          <section className="overflow-hidden rounded-2xl border border-slate-800 bg-[#111925] shadow-xl shadow-black/10 transition-colors duration-300 hover:border-slate-700" style={{ display: activePage === "forensics" ? undefined : 'none' }}>
+            <div className="flex flex-col justify-between gap-4 border-b border-slate-800/90 p-5 sm:p-6 lg:flex-row lg:items-center">
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-cyan-400">
                   Transfer Forensics
@@ -943,13 +993,13 @@ export default function AdminSecurityCenter() {
             </div>
 
             <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1.2fr_.8fr]">
-              <div className="rounded-2xl border border-white/[0.06] bg-black/20 p-5">
+              <div className="rounded-2xl border border-slate-800 bg-black/20 p-5">
                 <div className="mb-5 flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
                     <FileCheck2 className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-600">
+                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">
                       Integrity Intelligence
                     </p>
                     <p className="text-xs font-bold text-white">
@@ -960,7 +1010,7 @@ export default function AdminSecurityCenter() {
 
                 <div className="space-y-3">
                   <div className="rounded-xl border border-white/[0.05] bg-white/[0.015] p-4">
-                    <p className="mb-2 text-[8px] font-black uppercase tracking-[0.18em] text-slate-700">
+                    <p className="mb-2 text-[8px] font-black uppercase tracking-[0.18em] text-slate-400">
                       Original Hash
                     </p>
                     <p className="break-all font-mono text-[9px] leading-5 text-slate-400">
@@ -975,7 +1025,7 @@ export default function AdminSecurityCenter() {
                         : "border-emerald-500/10 bg-emerald-500/[0.025]"
                     }`}
                   >
-                    <p className="mb-2 text-[8px] font-black uppercase tracking-[0.18em] text-slate-700">
+                    <p className="mb-2 text-[8px] font-black uppercase tracking-[0.18em] text-slate-400">
                       Current Hash
                     </p>
                     <p
@@ -992,21 +1042,21 @@ export default function AdminSecurityCenter() {
               </div>
 
               <div className="space-y-3">
-                <div className="rounded-2xl border border-white/[0.06] bg-black/20 p-5">
-                  <p className="text-[8px] font-black uppercase tracking-[0.18em] text-slate-700">
+                <div className="rounded-2xl border border-slate-800 bg-black/20 p-5">
+                  <p className="text-[8px] font-black uppercase tracking-[0.18em] text-slate-400">
                     Transmission Identity
                   </p>
 
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center justify-between gap-4">
-                      <span className="text-[10px] text-slate-600">Sender</span>
+                      <span className="text-[10px] text-slate-400">Sender</span>
                       <span className="truncate text-right text-[10px] font-bold text-slate-300">
                         {selectedTransfer.sender.fullName}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                      <span className="text-[10px] text-slate-600">Receiver</span>
+                      <span className="text-[10px] text-slate-400">Receiver</span>
                       <span className="truncate text-right text-[10px] font-bold text-slate-300">
                         {selectedTransfer.receiver?.fullName ||
                           selectedTransfer.receiverEmail}
@@ -1014,14 +1064,14 @@ export default function AdminSecurityCenter() {
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                      <span className="text-[10px] text-slate-600">Department</span>
+                      <span className="text-[10px] text-slate-400">Department</span>
                       <span className="text-right text-[10px] font-bold text-slate-300">
                         {selectedTransfer.department || "Unassigned"}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                      <span className="text-[10px] text-slate-600">Created</span>
+                      <span className="text-[10px] text-slate-400">Created</span>
                       <span className="text-right text-[10px] font-bold text-slate-300">
                         {formatTime(selectedTransfer.createdAt)}
                       </span>
@@ -1048,7 +1098,7 @@ export default function AdminSecurityCenter() {
                     )}
 
                     <div>
-                      <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-600">
+                      <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">
                         Security Assessment
                       </p>
                       <p
@@ -1075,8 +1125,8 @@ export default function AdminSecurityCenter() {
         )}
 
         {/* EVENT STREAM */}
-        <section className="overflow-hidden rounded-[28px] border border-white/[0.08] bg-slate-950/80">
-          <div className="flex items-center justify-between border-b border-white/[0.06] p-5 sm:p-6">
+        <section className="overflow-hidden rounded-2xl border border-slate-800 bg-[#111925] shadow-xl shadow-black/10 transition-colors duration-300 hover:border-slate-700" style={{ display: activePage === "events" ? undefined : 'none' }}>
+          <div className="flex items-center justify-between border-b border-slate-800/90 p-5 sm:p-6">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
                 <Terminal className="h-4 w-4" />
@@ -1091,7 +1141,7 @@ export default function AdminSecurityCenter() {
               </div>
             </div>
 
-            <div className="hidden items-center gap-2 text-[9px] font-bold uppercase tracking-[0.15em] text-slate-700 sm:flex">
+            <div className="hidden items-center gap-2 text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400 sm:flex">
               <Activity className="h-3.5 w-3.5" />
               Streaming
             </div>
@@ -1131,13 +1181,13 @@ export default function AdminSecurityCenter() {
                       )}
                     </div>
 
-                    <p className="mt-1 line-clamp-2 text-[9px] leading-4 text-slate-600">
+                    <p className="mt-1 line-clamp-2 text-[9px] leading-4 text-slate-400">
                       {log.description}
                     </p>
 
                     <div className="mt-1 flex gap-2 text-[8px] text-slate-800">
                       <span>{log.user.fullName}</span>
-                      <span>•</span>
+                      <span>â€¢</span>
                       <span>{formatTime(log.createdAt)}</span>
                     </div>
                   </div>
@@ -1145,7 +1195,7 @@ export default function AdminSecurityCenter() {
               ))}
 
               {logs.length === 0 && (
-                <div className="p-8 text-center text-xs text-slate-700">
+                <div className="p-8 text-center text-xs text-slate-400">
                   No security events recorded.
                 </div>
               )}
@@ -1154,7 +1204,7 @@ export default function AdminSecurityCenter() {
             <div className="border-t border-white/[0.06] bg-black/10 p-5 sm:p-6 lg:border-l lg:border-t-0">
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-700">
+                  <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">
                     Selected Transfer
                   </p>
                   <p className="mt-1 text-xs font-bold text-slate-300">
@@ -1162,7 +1212,7 @@ export default function AdminSecurityCenter() {
                   </p>
                 </div>
 
-                <Clock3 className="h-4 w-4 text-slate-700" />
+                <Clock3 className="h-4 w-4 text-slate-400" />
               </div>
 
               <div className="space-y-3">
@@ -1184,7 +1234,7 @@ export default function AdminSecurityCenter() {
                       <p className="text-[10px] font-bold text-slate-400">
                         {log.action}
                       </p>
-                      <p className="mt-0.5 text-[8px] leading-4 text-slate-700">
+                      <p className="mt-0.5 text-[8px] leading-4 text-slate-400">
                         {log.description}
                       </p>
                     </div>
@@ -1192,7 +1242,7 @@ export default function AdminSecurityCenter() {
                 ))}
 
                 {selectedLogs.length === 0 && (
-                  <div className="rounded-xl border border-white/[0.05] bg-white/[0.015] p-6 text-center text-[9px] text-slate-700">
+                  <div className="rounded-xl border border-white/[0.05] bg-white/[0.015] p-6 text-center text-[9px] text-slate-400">
                     Select a transfer to inspect its event chronology.
                   </div>
                 )}
@@ -1201,6 +1251,7 @@ export default function AdminSecurityCenter() {
           </div>
         </section>
 
+        {activePage === "users" && <AdminUserManagement />}
         {/* SYSTEM FOOTER */}
         <footer className="grid gap-3 pb-4 sm:grid-cols-3">
           {[
@@ -1226,16 +1277,17 @@ export default function AdminSecurityCenter() {
             >
               <item.icon className="h-4 w-4 text-blue-400" />
               <div>
-                <p className="text-[8px] font-black uppercase tracking-[0.15em] text-slate-700">
+                <p className="text-[8px] font-black uppercase tracking-[0.15em] text-slate-400">
                   {item.label}
                 </p>
-                <p className="mt-0.5 text-[10px] font-bold text-slate-500">
+                <p className="mt-0.5 text-[10px] font-bold text-slate-400">
                   {item.value}
                 </p>
               </div>
             </div>
           ))}
         </footer>
+        </div>
       </div>
     </main>
   );

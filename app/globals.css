@@ -241,3 +241,52 @@ body {
     @apply px-4 py-5;
   }
 }
+
+/* SATIM live network packet visualization */
+@keyframes satim-packet-travel {
+  0% {
+    left: 0%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.7);
+  }
+  12% { opacity: 1; }
+  85% { opacity: 1; }
+  100% {
+    left: 100%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes satim-packet-flow {
+  from { transform: translateX(-100%); opacity: .3; }
+  to { transform: translateX(300%); opacity: 1; }
+}
+
+@keyframes satim-network-pulse {
+  0%, 100% { opacity: .65; box-shadow: 0 0 0 0 currentColor; }
+  50% { opacity: 1; box-shadow: 0 0 0 5px transparent; }
+}
+
+.satim-packet-flow {
+  animation: satim-packet-flow 1.8s linear infinite;
+}
+
+.satim-packet {
+  animation: satim-packet-travel 2.4s linear infinite;
+}
+
+.satim-packet-two { animation-delay: .8s; }
+.satim-packet-three { animation-delay: 1.6s; }
+
+.satim-network-pulse {
+  animation: satim-network-pulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .satim-packet,
+  .satim-packet-flow,
+  .satim-network-pulse {
+    animation: none !important;
+  }
+}
