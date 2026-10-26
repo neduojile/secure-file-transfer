@@ -386,7 +386,7 @@ export default function AdminSecurityCenter() {
                   </div>
                 </section>
 
-                
+
                 <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
                     <div>
