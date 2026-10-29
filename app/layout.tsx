@@ -1,22 +1,16 @@
-import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+﻿import type { Metadata, Viewport } from "next";
 import { Toaster } from "sonner";
 
 import Providers from "@/components/providers";
 
 import "./globals.css";
 
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"),
 
   title: {
-    default: "SATIM — Secure Academic Transfer & Integrity Monitoring",
+    default: "SATIM â€” Secure Academic Transfer & Integrity Monitoring",
     template: "%s | SATIM",
   },
 
@@ -64,7 +58,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geist.variable} h-full scroll-smooth`}
+      className={`h-full scroll-smooth`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
